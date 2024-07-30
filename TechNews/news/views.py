@@ -1,10 +1,8 @@
-from django.shortcuts import render
 from rest_framework.mixins import ListModelMixin
 from rest_framework.generics import GenericAPIView
 from .serializers import NewsSerializer
 from .models import News
 from rest_framework.response import Response
-from django.db.models import Count
 
 
 class NewsListAPIViews(GenericAPIView, ListModelMixin):
