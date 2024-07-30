@@ -129,6 +129,8 @@ class NewsListAPIViewsTests(APITestCase):
         serializer = NewsSerializer(news, many=True)
         self.assertEqual(response.data, serializer.data)
 
+
+
         response = self.client.get(url, {'tags': [self.tag1.name, self.tag3.name]})
 
         news = set(News.objects.filter(tags__name__in=[self.tag1.name, self.tag3.name]))
