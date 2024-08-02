@@ -25,24 +25,24 @@ class MyScraperPipeline:
         print(f"body: {body} ({type(body)})")
         print(f"tags: {tags} ({type(tags)})")
         print(f"resources: {resources} ({type(resources)})")
-        # 
-        # if not all([title, body, tags, resources]):
-        #     spider.logger.error(f"Missing fields in item: {item}")
-        #     return
-        # 
-        # news = News.objects.all()
-        # print(news)
-        # news_item, created = News.objects.update_or_create(
-        #     title=title,
-        #     defaults={
-        #         'body': body,
-        #         'resources': resources,
-        #     }
-        # )
-        # for tag_name in tags:
-        #     tag, created = Tag.objects.get_or_create(name=tag_name)
-        #     news_item.tags.add(tag)
-        #     tag.save()
-        # news_item.save()
-        # return item
+
+        if not all([title, body, tags, resources]):
+            spider.logger.error(f"Missing fields in item: {item}")
+            return
+
+        news = News.objects.all()
+        print(news)
+        news_item, created = News.objects.update_or_create(
+            title=title,
+            defaults={
+                'body': body,
+                'resources': resources,
+            }
+        )
+        for tag_name in tags:
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            news_item.tags.add(tag)
+            tag.save()
+        news_item.save()
+        return item
 

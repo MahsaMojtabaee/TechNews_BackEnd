@@ -13,7 +13,7 @@ class FinalSpider(scrapy.Spider):
     name = 'scrape'
     start_urls = ['https://www.zoomit.ir/archive/']
     current_page = 1
-    max_page=3
+    max_page = 500
     count = 0
     base_url = 'https://www.zoomit.ir/archive/'
     current_url = 'https://www.zoomit.ir/archive/?pageNumber={}'
@@ -57,7 +57,6 @@ class FinalSpider(scrapy.Spider):
             self.logger.info(f'Links: {links}')
             yield scrapy.Request(links[0], callback=self.parse_content, meta={'links': links})
 
-
     def parse_content(self, response):
         self.driver.get(response.url)
         links = response.meta.get('links')
@@ -78,7 +77,7 @@ class FinalSpider(scrapy.Spider):
             print(f'Error waiting for div element: {e}')
 
         try:
-            a_tags = self.wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'div_element_selector a')))
+            a_tags = div_element_tags.find_elements(By.CSS_SELECTOR, 'a')
             tags = [a.text for a in a_tags]
         except Exception as e:
             self.logger.error(f'Error extracting tags: {e}')
@@ -97,24 +96,14 @@ class FinalSpider(scrapy.Spider):
         items['title'] = h1_title
         items['tags'] = tags
         items['body'] = body
+        print(f'tags are {tags}')
         yield items
 
         if len(links) > 0:
-            yield scrapy.Request(url=links[0], callback=self.parse_content, meta={'links':links})
+            yield scrapy.Request(url=links[0], callback=self.parse_content, meta={'links': links})
 
-        if self.current_page < 3:
+        if self.current_page < self.max_page:
             self.current_page += 1
             next_page = self.current_url.format(self.current_page)
             print(f'next page is {next_page}')
             yield scrapy.Request(next_page, callback=self.parse)
-
-        # if len(links) <= 0:
-        #     if self.current_page < 3:
-        #         self.current_page += 1
-        #         next_page = self.current_url.format(self.current_page)
-        #         self.logger.info(f'Next page URL: {next_page}')
-        #         yield scrapy.Request(url=next_page, callback=self.parse)
-        #     else:
-        #         yield None
-        # else:
-        #     yield scrapy.Request(url=links[0], callback=self.parse_content, meta={'links':links})

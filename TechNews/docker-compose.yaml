@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn TechNews.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@localhost:5672/
+
+  celery_worker:
+    build: .
+    command: celery -A celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+
+
+  scrapy_runner:
+    build: .
+    command: python tasks.py
+    volumes:
+      - .:/app
+
+
