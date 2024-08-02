@@ -10,3 +10,8 @@ def crawl():
     process = CrawlerProcess(settings)
     process.crawl(FinalSpider)
     process.start()
+
+
+if __name__ == '__main__':
+    result = crawl.delay()
+    print(result.status)
